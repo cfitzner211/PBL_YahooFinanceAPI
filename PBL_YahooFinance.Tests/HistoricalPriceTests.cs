@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
@@ -40,13 +41,34 @@ namespace PBL_YahooFinance.Tests
         [Fact]
         public async Task HistoricalTest()
         {
-            var candles = await Yahoo.GetHistoricalAsync("AAPL", new DateTime(2017, 1, 3), new DateTime(2017, 1, 4), Period.Daily);
+            var result = new Dictionary<string, Candle>();
+            var tickerList = new List<string>() { "ABEV", "AZUL", "BAK", "BBD", "CBD", "ELP", "ERJ", "GGB", "GOL", "ITUB", "LTM", "PBR/A", "RIO", "SCCO", "SID", "TSU", "UGP", "VALE", "VIV", "AFYA", "ARCE", "ARCO", "ASR", "AVHOQ", "BAP", "BNFT", "BRFS", "BRZU", "BVN", "CAAP", "CEPU", "CIB", "CPA", "CVA", "CX", "DESP", "EC", "EPOL", "EWZ", "GLD", "INDA", "IRCP", "IRS", "JAMF", "LOMA", "MELI", "MTSI", "OIBR/C", "PAGS", "PAM", "PEGI", "PPC", "SLV", "SPWR", "STNE", "TEO", "TGS", "TSLA", "UGLD", "USO", "UWT", "VIST", "VLRS", "VTRU", "VXX", "WDAY", "XP", "YPF", "PAK" };
+        
+            foreach(var ticker in tickerList)
+            {
+                Candle candle = null;
 
-            Assert.Equal(115.800003m, candles.First().Open);
-            Assert.Equal(116.330002m, candles.First().High);
-            Assert.Equal(114.760002m, candles.First().Low);
-            Assert.Equal(116.150002m, candles.First().Close);
-            Assert.Equal(28_781_900, candles.First().Volume);
+                try
+                {
+                    var candles = await Yahoo.GetHistoricalAsync(ticker, new DateTime(2020, 9, 22), new DateTime(2020, 9, 23), Period.Daily);
+                    candle = candles.First();
+                }
+                catch (Exception ex) {  }
+
+                result.Add(ticker, candle);
+            }
+
+            foreach(var item in result)
+            {
+                var ticker = item.Key;
+                var candle = item.Value;
+                Debug.WriteLine($"{ticker};{candle?.Close};{candle?.AdjustedClose};{candle?.Volume}");
+            }
+            // Assert.Equal(115.800003m, candles.First().Open);
+            // Assert.Equal(116.330002m, candles.First().High);
+            // Assert.Equal(114.760002m, candles.First().Low);
+            // Assert.Equal(116.150002m, candles.First().Close);
+            // Assert.Equal(28_781_900, candles.First().Volume);
         }
 
         [Fact]
